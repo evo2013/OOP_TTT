@@ -19,7 +19,7 @@ class Player
 
   def get_avatar
     puts "What is your name?"
-    avatar = gets.chomp.capitalize
+    name = gets.chomp.capitalize
   end
 end
 
@@ -55,10 +55,6 @@ class Board
     @squares.select {|keys| @squares[keys] == " "}.keys
   end
 
-  def get_filled_positions
-    @squares.select { |k, v| %w[X O].include? v }.keys
-  end
-
   def all_filled_positions?
     get_empty_positions == []
   end
@@ -79,6 +75,9 @@ class Game
                   Let's Get Started...
 ***********************************************************  "
     puts
+  end
+
+  def initialize
     @board = Board.new
     @ruby_bot = Bot.new("RubyBot", "O")
     @player = Player.new("Human", "X")
@@ -112,8 +111,10 @@ class Game
   def win_check
     win_trio = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [3,5,7]] 
     win_trio.each do |trio|
-      return "Player" if  @board.squares.select { |square, _| trio.include?(square) }.values.count('X') == 3
-      return "RubyBot" if @board.squares.select { |square, _| trio.include?(square) }.values.count('O') == 3
+      # return "Player" if  @board.squares.select { |square, _| trio.include?(square) }.values.count('X') == 3
+      # return "RubyBot" if @board.squares.select { |square, _| trio.include?(square) }.values.count('O') == 3
+      return "Player" if  @board.squares.values_at(*trio).count('X') == 3
+      return "RubyBot" if @board.squares.values_at(*trio).count('O') == 3
     end
     nil
   end
@@ -127,18 +128,17 @@ class Game
       filled = @board.all_filled_positions?
       alternate
     end until winner || filled
-      if winner == "Player"
-        puts "\nCongratulations #{@player.name} - You won this round!\n"
-        exit
-      elsif winner == "RubyBot"
-        puts "\nRubyBot won this round!\n"
-        exit
-      else 
-        puts "\nIt's a tie! No one won this round!\n"
-        exit
-      end
+    if winner == "Player"
+      puts "\nCongratulations #{@player.name} - You won this round!\n"
+      exit
+    elsif winner == "RubyBot"
+      puts "\nRubyBot won this round!\n"
+      exit
+    else 
+      puts "\nIt's a tie! No one won this round!\n"
+      exit
     end
+  end
 end
 
-game = Game.new
-game.run
+game = Game.new.run
